@@ -1,0 +1,6 @@
+#!/bin/sh
+# Harness shim. `neo-channels` is denied to the agent outright in normal
+# operation; it is denied here too, and by a second mechanism, because a run
+# that changed a channel disposition would change what every later run can see.
+echo "neo-channels: not available inside an evaluation run." >&2
+exit 78

@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+*.db
+*.db-*
+*.session
+*.session-journal
+.env
+*token*.json
+proposed-*.sh
+harness/runs/
+harness/fixtures/
+harness/step8/ground-truth/
+harness/heldout/MANIFEST.json
+harness/heldout/SHINGLES.json
+.DS_Store

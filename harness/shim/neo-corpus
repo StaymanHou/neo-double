@@ -1,0 +1,79 @@
+#!/bin/sh
+# Harness shim for `neo-corpus`. Placed first on PATH for a graded session only.
+#
+# It exists so a graded session cannot read the traffic its own scenario was
+# generated from. Scenarios come from what step 5 ingested — everything after
+# the fixture's cutoff — so a session that can query past the cutoff is reading
+# the answer key, and the run measures nothing.
+#
+# Two jobs:
+#   1. CLAMP. Append `--until $NEO_EVAL_CUTOFF` to every row-emitting verb.
+#      Appended last on purpose: argparse takes the last occurrence, so a
+#      session-supplied `--until` cannot widen the window, only narrow it.
+#   2. LOG. Record every invocation to $NEO_EVAL_SHIM_LOG, so the runner can
+#      check the transcript against this file and see whether anything reached
+#      the corpus by another route.
+#
+# What it does NOT do: `stats` and `channels-pending` take no `--until`, so they
+# pass through unclamped and `stats` will print the corpus's true end date. That
+# is metadata, not content — it tells a session that a cutoff is in force, which
+# is not a thing this harness tries to hide. See README § What isolation means.
+
+set -e
+
+if [ -z "$NEO_EVAL_CUTOFF" ]; then
+    echo "neo-corpus (harness shim): NEO_EVAL_CUTOFF is unset — refusing to run." >&2
+    echo "This shim must only be reached from inside a harness run." >&2
+    exit 78
+fi
+
+REAL="${NEO_CORPUS_BIN:-$HOME/.local/bin/neo-corpus}"
+VERB="$1"
+
+# Every row-emitting verb. `stats` and `channels-pending` emit counts only and
+# accept no date filter.
+case "$VERB" in
+    chats|people|outbound|thread|mail|roster|timeline|recent|search)
+        CLAMP=1 ;;
+    *)
+        CLAMP=0 ;;
+esac
+
+# Honour a session's own `--until` when it is already inside the window.
+#
+# The first version appended the clamp unconditionally, which meant a session asking for
+# `--until 2024-08-01` silently got the cutoff instead — and then reasonably concluded the
+# SENSOR was ignoring `--until` and filed a bug against it. It was the shim. A clamp that
+# makes the tool lie to the session about its own filters does not just waste the session's
+# effort, it manufactures false findings, and this harness exists to catch false findings
+# rather than generate them.
+#
+# So: clamp only when it would actually narrow. ISO-8601 sorts lexicographically, so a plain
+# string comparison is the right one.
+USER_UNTIL=""
+prev=""
+for a in "$@"; do
+    case "$a" in
+        --until=*) USER_UNTIL="${a#--until=}" ;;
+        *) [ "$prev" = "--until" ] && USER_UNTIL="$a" ;;
+    esac
+    prev="$a"
+done
+
+APPEND=1
+if [ -n "$USER_UNTIL" ]; then
+    earliest=$(printf '%s\n%s\n' "$USER_UNTIL" "$NEO_EVAL_CUTOFF" | sort | head -1)
+    [ "$earliest" = "$USER_UNTIL" ] && APPEND=0
+fi
+[ "$CLAMP" = "0" ] && APPEND=0
+
+if [ -n "$NEO_EVAL_SHIM_LOG" ]; then
+    printf '%s\tclamp=%s\tappended=%s\t%s\n' \
+        "$(date -u +%Y-%m-%dT%H:%M:%SZ)" "$CLAMP" "$APPEND" "$*" >> "$NEO_EVAL_SHIM_LOG"
+fi
+
+if [ "$APPEND" = "1" ]; then
+    exec "$REAL" "$@" --until "$NEO_EVAL_CUTOFF"
+else
+    exec "$REAL" "$@"
+fi

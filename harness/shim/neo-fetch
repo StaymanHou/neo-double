@@ -1,0 +1,6 @@
+#!/bin/sh
+# Harness shim. `neo-fetch` is a write path into the fenced corpus; a graded
+# session has no business on the far side of the fence, and a pull mid-run would
+# move the corpus underneath the fixture. Refuse loudly rather than silently.
+echo "neo-fetch: not available inside an evaluation run." >&2
+exit 78

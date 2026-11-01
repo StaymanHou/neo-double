@@ -1,0 +1,64 @@
+{
+  "claudeMdExcludes": [
+    "<HOME>/.claude/CLAUDE.md"
+  ],
+  "cleanupPeriodDays": 99999,
+  "hooks": {
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "args": [
+              "python3",
+              "<HOME>/.config/claude-neo/hooks/guard-banned-entities.py"
+            ],
+            "command": "/usr/bin/env",
+            "statusMessage": "Checking the banned-entity list",
+            "timeout": 10,
+            "type": "command"
+          }
+        ],
+        "matcher": "Write|Edit|MultiEdit|NotebookEdit"
+      },
+      {
+        "hooks": [
+          {
+            "args": [
+              "python3",
+              "<HOME>/.config/claude-neo/hooks/guard-send-approval.py"
+            ],
+            "command": "/usr/bin/env",
+            "statusMessage": "Checking the send approval is the operator's words",
+            "timeout": 10,
+            "type": "command"
+          }
+        ],
+        "matcher": "Bash"
+      }
+    ]
+  },
+  "permissions": {
+    "allow": [
+      "Bash(neo-corpus:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ],
+    "defaultMode": "auto",
+    "deny": [
+      "Read(/<HOME>/.local/state/neo/**)",
+      "Bash(sqlite3:*)",
+      "Bash(pg_dump:*)",
+      "Bash(psql:*)",
+      "Bash(docker:*)",
+      "Bash(neo-channels:*)",
+      "Read(/<HOME>/Backups/neo-corpus-**)"
+    ]
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "<HOME>/.config/claude-neo/statusline.sh"
+  }
+}

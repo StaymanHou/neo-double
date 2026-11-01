@@ -1,0 +1,230 @@
+#!/usr/bin/env python3
+"""Held-out clamp for `neo-corpus`. First on PATH for a VOICE-BUILD session only.
+
+Step 8 scores drafts against messages the operator actually sent. Step 7 builds the voice model
+that produces those drafts. If step 7 reads step 8's messages, step 8 grades the model on its
+own input and passes regardless of quality — the failure is silent and there is nothing
+downstream that would notice it.
+
+The held-out set is therefore carved first (`harness/heldout/carve.py`) and this shim removes
+those rows from every read path that could show a body. It is a clamp, not a promise: a session
+running behind it cannot reach the held-out messages by asking differently.
+
+Three things it has to get right, each of which would otherwise make the filter silently inert:
+
+  1. `--preview N` truncates bodies, so a previewed row hashes to something else entirely.
+     The shim strips `--preview` before calling the real command, filters against full bodies,
+     and re-applies the truncation itself — byte-identically to `corpus_cli.shape()`.
+  2. `search` returns an 18-token SNIPPET by default, not the body — so a held-out message
+     hashes to nothing recognisable and the filter passes it straight through. The shim
+     therefore appends `--full` to every search, filters against the real body, and re-applies
+     the reader's `--preview` if they asked for one. This was not caught by reading the code;
+     `self-test.py` caught it, on a check written to fail if the filter ever went inert.
+  3. `search` also wraps every match in «guillemets», so a hit hashes to something else again.
+     Those markers are stripped before hashing and left in the output.
+  4. `thread` rows carry neither a chat nor a channel. Body hash is the only identifier common
+     to every verb, which is why the manifest keys on it alone.
+
+It refuses text output for the body-emitting verbs rather than trying to filter it. Parsing a
+human-readable table to decide what to delete is exactly the kind of convention this codebase
+keeps finding holes in; requiring `--json` costs the one session that runs behind this shim
+nothing, and makes the filter structural.
+
+WHAT IT DOES NOT DO. It hides 60 messages from a corpus of 85,701. It does not stop a session
+reading the manifest, running the real binary by absolute path, or querying the store another
+way. Like the step-6 shim it is a clamp on the ordinary path, and the backstop is the audit:
+every example quoted in `style.md` and `values.md` is checked against the held-out set
+afterwards, and a hit voids the build.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import json
+import os
+import subprocess
+import sys
+import time
+
+REAL = os.environ.get("NEO_CORPUS_BIN", os.path.expanduser("~/.local/bin/neo-corpus"))
+
+# Verbs that can put a message body on stdout. `chats`, `people`, `roster`, `timeline`, `stats`
+# and `channels-pending` emit counts and names only, and pass straight through.
+BODY_VERBS = {"outbound", "thread", "mail", "recent", "search"}
+
+# Verbs that can return somebody ELSE's message. A reply quotes what it answers, so a held-out
+# message comes back through its own thread inside a row that hashes to something entirely
+# different — exact-hash filtering runs clean and the content arrives anyway. Measured at 44%
+# of one held-out Outlook message. `outbound` is his own prose only and needs no such check,
+# which is what keeps the expensive path off the 17,000-row query.
+QUOTE_VERBS = {"thread", "mail", "recent", "search"}
+
+SHINGLE_K = 32
+DIGEST_CHARS = 12
+# A row is dropped when this fraction of some held-out message is present in it. The measured
+# noise floor at k=32 — containment across a boundary where the true answer must be zero — is
+# 0.03, so 0.30 sits an order of magnitude above coincidence and well below a real quotation.
+CONTAINMENT = 0.30
+
+
+def die(msg: str, code: int = 78) -> None:
+    print(f"neo-corpus (voice-build shim): {msg}", file=sys.stderr)
+    sys.exit(code)
+
+
+def load_heldout() -> set[str]:
+    path = os.environ.get("NEO_VOICE_HELDOUT")
+    if not path:
+        die("NEO_VOICE_HELDOUT is unset — refusing to run.\n"
+            "This shim must only be reached from a step-7 voice-build session, with the "
+            "held-out manifest named. If you are not building the voice model, take "
+            "harness/shim-voice off PATH and use the real command.")
+    try:
+        manifest = json.loads(open(path, encoding="utf-8").read())
+    except OSError as e:
+        die(f"cannot read NEO_VOICE_HELDOUT ({path}): {e}")
+    held = {e["body_sha256"] for e in manifest["entries"]}
+    if not held:
+        die(f"the manifest at {path} holds nothing out. A clamp over an empty set is a clamp "
+            f"that cannot fail, which is worse than no clamp at all.")
+    return held
+
+
+def load_shingles(manifest_path: str) -> list[frozenset]:
+    """The digest sidecar. Absent is fatal, not a degraded mode — a shim that quietly stopped
+    catching quoted content would report exactly the same clean run as one that was working."""
+    side = os.path.join(os.path.dirname(manifest_path), "SHINGLES.json")
+    try:
+        blob = json.loads(open(side, encoding="utf-8").read())
+    except OSError:
+        die(f"missing {side}. Re-run harness/heldout/carve.py; without it the shim cannot "
+            f"recognise a held-out message quoted inside somebody else's reply.")
+    return [frozenset(v) for v in blob["sets"].values() if v]
+
+
+def digests(text: str) -> set[str]:
+    t = " ".join(text.split())
+    return {hashlib.sha256(t[i:i + SHINGLE_K].encode("utf-8")).hexdigest()[:DIGEST_CHARS]
+            for i in range(max(1, len(t) - SHINGLE_K + 1))}
+
+
+def split_preview(argv: list[str]) -> tuple[list[str], int]:
+    """Remove `--preview N` / `--preview=N`, returning the cleaned argv and N."""
+    out, n, i = [], 0, 0
+    while i < len(argv):
+        a = argv[i]
+        if a == "--preview" and i + 1 < len(argv):
+            n = int(argv[i + 1]); i += 2; continue
+        if a.startswith("--preview="):
+            n = int(a.split("=", 1)[1]); i += 1; continue
+        out.append(a); i += 1
+    return out, n
+
+
+def main() -> int:
+    argv = sys.argv[1:]
+    verb = argv[0] if argv else ""
+    held = load_heldout()
+
+    log = os.environ.get("NEO_VOICE_SHIM_LOG")
+
+    def record(note: str) -> None:
+        if log:
+            with open(log, "a", encoding="utf-8") as fh:
+                fh.write(f"{time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}\t"
+                         f"{note}\t{' '.join(argv)}\n")
+
+    # `--help` prints usage, not messages. Refusing it taught the reader that a body verb was
+    # unusable, which is both false and the sort of thing that gets worked around.
+    if verb not in BODY_VERBS or "--help" in argv or "-h" in argv:
+        record("passthrough")
+        return subprocess.run([REAL, *argv]).returncode
+
+    if "--json" not in argv:
+        record("refused-not-json")
+        die(f"`{verb}` can emit message bodies, so this shim only serves it as JSON.\n"
+            f"Re-run with --json. (The held-out rows for step 8 are removed from the result; "
+            f"filtering a human-readable table by pattern-matching it is the kind of "
+            f"convention that turns into a hole.)")
+
+    clean, preview_n = split_preview(argv)
+
+    # `search` must be answered with real bodies or the hash filter cannot see anything.
+    # Appended last, so a session cannot take it back off — the same reason the step-6 shim
+    # appends its `--until` last.
+    forced_full = verb == "search" and "--full" not in clean
+    if forced_full:
+        clean = [*clean, "--full"]
+
+    proc = subprocess.run([REAL, *clean], capture_output=True, text=True)
+    if proc.stderr:
+        sys.stderr.write(proc.stderr)
+    if proc.returncode != 0:
+        record(f"real-exit-{proc.returncode}")
+        sys.stdout.write(proc.stdout)
+        return proc.returncode
+
+    # `search` prints a `mode:` line before its JSON. Anything ahead of the array is passed
+    # through untouched rather than parsed.
+    out = proc.stdout
+    start = out.find("[")
+    if start == -1:
+        record("no-json-array")
+        sys.stdout.write(out)
+        return 0
+    preamble, payload = out[:start], out[start:]
+
+    try:
+        rows = json.loads(payload)
+    except json.JSONDecodeError:
+        record("unparseable")
+        die("could not parse the real command's JSON. Refusing to emit it unfiltered.")
+
+    if not isinstance(rows, list):
+        record("non-list-json")
+        sys.stdout.write(out)
+        return 0
+
+    sets = load_shingles(os.environ["NEO_VOICE_HELDOUT"]) if verb in QUOTE_VERBS else []
+
+    kept, withheld, quoted = [], 0, 0
+    for r in rows:
+        text = r.get("text")
+        if text is not None:
+            # Strip search's match markers before hashing; they are formatting, not content.
+            probe = text.replace("«", "").replace("»", "")
+            if hashlib.sha256(probe.encode("utf-8")).hexdigest() in held:
+                withheld += 1
+                continue
+            if sets and len(probe) >= SHINGLE_K:
+                d = digests(probe)
+                if any(len(s & d) / len(s) >= CONTAINMENT for s in sets):
+                    quoted += 1
+                    continue
+            if preview_n and len(text) > preview_n:
+                r["text"] = text[:preview_n].rstrip() + " …"
+        kept.append(r)
+
+    sys.stdout.write(preamble)
+    print(json.dumps(kept, indent=2, ensure_ascii=False))
+
+    # Say so. A row that vanishes without comment is the defect this codebase keeps finding —
+    # a tool reporting absence when it means "withheld". The count is the difference between a
+    # gap you can reason about and a silence you cannot.
+    if forced_full:
+        print("neo-corpus (voice-build shim): answered `search` with --full. A snippet cannot "
+              "be matched against the held-out set, so the filter would have been inert. Use "
+              "--preview N to shorten what comes back.", file=sys.stderr)
+    if withheld or quoted:
+        detail = f"{withheld} held out for step 8"
+        if quoted:
+            detail += f", {quoted} quoting a held-out message"
+        print(f"neo-corpus (voice-build shim): {withheld + quoted} row(s) withheld — {detail}. "
+              f"The gap is deliberate; it is not an absence in the corpus.", file=sys.stderr)
+    record(f"filtered-{withheld}-quoted-{quoted}-of-{len(rows)}"
+           f"{' full-forced' if forced_full else ''}")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

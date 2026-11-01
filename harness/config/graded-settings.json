@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "defaultMode": "auto",
+    "allow": [
+      "Bash(neo-corpus:*)"
+    ],
+    "deny": [
+      "Read(//{WORKSPACE}/**)",
+      "Read(//{STATE_DIR}/**)",
+      "Bash(neo-channels:*)",
+      "Bash(neo-fetch:*)",
+      "Bash(git:*)",
+      "Bash(sqlite3:*)",
+      "Bash(psql:*)",
+      "Bash(docker:*)",
+      "Bash(/{CORPUS_BIN}:*)",
+      "Bash(/{SENSOR_BIN}:*)"
+    ]
+  }
+}

@@ -1,0 +1,4 @@
+#!/bin/sh
+# Entry point. Stdlib python3 only — no venv, deliberately: the harness must
+# keep working when sensor/'s environment does not.
+exec /usr/bin/env python3 "$(dirname "$0")/neo_eval.py" "$@"
