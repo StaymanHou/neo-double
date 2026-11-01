@@ -149,7 +149,7 @@ skim the red.** Ten defects were found in this project's own checks and five wer
 species. The script resolves against every plausible root before reporting.
 
 **It bites, and that was verified rather than assumed** — on a probe file it catches
-`neo_sensor/fetch.py`, which is precisely the [F-001](../../../docs/lessons.md#f-001) defect: the
+`neo_sensor/fetch.py`, which is precisely the [F-001](../../../docs/example-corrections.md#f-001) defect: the
 module name that does not exist, handed to the operator in a command they were expected to type.
 **A command you cite is a command you check**, and this is the mechanical form of that rule.
 
@@ -171,7 +171,7 @@ python3 tools/check-proposal-script.py --pre-handover workspace/proposed-*.sh
 **`--pre-handover` is the strict mode and it is the only one to use before writing the `!` line.**
 Afterwards, run it plain: a real disposition sitting where a `DECIDE` placeholder was **is what the
 file looks like once the operator has decided** — they edit the one word in place. Flagging that is
-a check firing on correct behaviour, and [F-009](../../../docs/lessons.md#f-009) is the record of
+a check firing on correct behaviour, and [F-009](../../../docs/example-corrections.md#f-009) is the record of
 doing exactly that: a defect was diagnosed, filed, wired in here and committed, and it was the
 operator's edit. **When two explanations fit and one of them is "they did it on purpose", ask.**
 

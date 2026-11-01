@@ -51,12 +51,11 @@ chosen by what the content seems to need rather than by what the operator would 
 fixes the envelope of the artefact you were asked for, and that is the wrong unit when a piece of the
 content belongs in a different message addressed to a different person.
 
-*(A real case: asked for a weekly department update, two candidates were offered that differed on
-whether the end of a contractor's engagement should be stated in it. The operator answered a
-question neither candidate had asked: **"The note on <the contractor> should be a separate note."**
-A departure is not a line item in a status update — it is addressed to the person, and the person
-was in the room. So the A/B was a choice between two wrong envelopes, and the gate had done its job
-perfectly one level too low.)*
+*(A real case: asked for a team-wide status update, two candidates were offered that differed on
+whether a matter about one person should be stated in it. The operator answered a question
+neither candidate had asked: it should be a separate note. A matter about a person is not a line
+item in a status update, so the A/B was a choice between two wrong envelopes, and the gate had done
+its job one level too low.)*
 
 The test is **who each part is addressed to.** A status update is addressed to a room; a thank-you,
 a farewell, an apology, a correction, a decision that lands on one person are addressed to somebody.
@@ -92,9 +91,8 @@ whose job is *correct a misunderstanding* reads as though it should start with t
 shape says otherwise. **Name the sentence that supplies the context before you draft the rest** — if
 you cannot, the message does not have one. This is not a licence to lengthen: the fix is one line,
 and rewriting a short message into an essay is the opposite failure, already on record.
-*([F-010](../../../docs/lessons.md#f-010) — all three candidates for a message to a contractor who
-had been silent three weeks opened on the instruction; the correction was "don't we need to give
-them some context first?")*
+*([F-010](../../../docs/example-corrections.md#f-010) — all three candidates for a message about a stalled task
+opened on the instruction, with no line of context first)*
 
 **Measure the length band from their own comparable messages**, not from what the content needs:
 
@@ -203,7 +201,7 @@ The general rule this is an instance of: **content destined to be copied verbati
 system is never reformatted to suit the file it is stored in** — no wrapping, no smart quotes, no
 markdown emphasis added, no list renumbering. *(Caught on the skill's first real use: "Why your
 draft candidate always have new lines that break the sentences?" —
-[F-003](../../../docs/lessons.md#f-003). It is the worst-shaped kind of defect: it passes every
+[F-003](../../../docs/example-corrections.md#f-003). It is the worst-shaped kind of defect: it passes every
 content check and damages the message at the last step, when it is sent.)*
 
 Copy `workspace/drafts/_TEMPLATE/` to `workspace/drafts/YYYY-MM-DD-<slug>/` and fill it in:
@@ -232,7 +230,7 @@ ruling is that running it is the agent's job behind an in-conversation approval 
 should also become yours but there must be an in-conversation approval gate."* So the sequence is:
 **preview the composed messages back to them in the turn → get their words →
 `--approve --quote '<their words>'` → `--commit`.** Handing them a `!` line for a send they have
-already approved is [F-001](../../../docs/lessons.md#f-001).
+already approved is [F-001](../../../docs/example-corrections.md#f-001).
 
 The gate cannot prove a human approved anything — you run both halves. What it makes impossible is
 drift: approved-this-sent-that, a message added or reordered, the right text in the wrong room, a

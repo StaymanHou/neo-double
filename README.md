@@ -6,6 +6,8 @@
 
 It is a **sanitized reference implementation** of a personal communications double on Telegram and Microsoft 365 email. It was extracted from a working system. No messages, people, knowledge or evaluation data from that system are included. Identity and paths are configuration.
 
+**Where things are:** doctrine in `framework/CLAUDE.md`; the **skills** in `framework/skills/` (`neo-bootstrap` builds the knowledge base from the corpus, `neo-voice` builds the style model, `neo-draft` drafts, `neo-close` runs end-of-session gates, `neo-prune` trims the knowledge base); the code in `sensor/`; evaluation in `harness/`; empty workspace templates in `workspace-template/`.
+
 ## When to read what
 
 | You need… | Read |
@@ -21,7 +23,8 @@ It is a **sanitized reference implementation** of a personal communications doub
 | Evaluation design: knowledge scenarios, held-out draft fidelity, leakage clamps, judge stability | `harness/README.md`, `harness/heldout/README.md` |
 | Lint checks run at close-out: dangling file pointers, generated disposition scripts | `tools/` |
 | The workspace layout and every template | `workspace-template/README.md` |
-| 21 corrections from real use, each turned into doctrine or a check | `docs/lessons.md` |
+| How to record the operator's corrections, plus three meta-lessons | `workspace-template/feedback/INDEX.md` |
+| Illustrative examples of corrections (**a general direction only; don't copy or reuse**) | `docs/example-corrections.md` |
 
 ## Status
 

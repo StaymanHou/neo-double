@@ -488,9 +488,9 @@ def truncation_note(
 
     **This exists because the silence was load-bearing.** Every limited read here returns the
     *newest* n ordered `DESC`, and prints a result indistinguishable in shape from a complete
-    one. On 2026-08-26 a session read a 320-message thread with `--limit 200`, saw no instance
-    of a piece of feedback in the newest 200, and reported to the operator that he had **never**
-    given it. He had — six times, five of them in the unread 120. The instruction *"a tool that
+    one. A session read a 320-message thread with `--limit 200`, saw no instance
+    of a piece of feedback in the newest 200, and reported to the operator that they had **never**
+    given it. They had, several times, mostly in the unread 120. The instruction *"a tool that
     reports absence is making a claim"* was already in doctrine; what was missing is that a tool
     returning a tail shaped exactly like a whole is making the same claim, silently.
 

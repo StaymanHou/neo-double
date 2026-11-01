@@ -24,6 +24,22 @@ Say which kind of closed it is.
 
 ---
 
+<a id="meta-lessons"></a>
+## Meta-lessons (from the reference system, across all its corrections)
+
+1. **A fix written for one form of a failure rarely reaches the same failure in another form.**
+   Several corrections came back looking different, and the first fix's wording didn't cover them.
+   Phrase rules around the *move* the agent made, not the *object* it made it on.
+2. **A tool that reports absence is making a claim.** More than once, the agent faithfully
+   repeated a silence that its own sensor had manufactured: a truncated read, or a field it
+   never captured.
+3. **One data point is not doctrine.** Record a correction in the operator's workspace first, and
+   generalize it into the framework only after a second instance, or when the operator says so.
+   Rules built from a single case, or from the operator merely accepting a proposal, went wrong.
+
+For what these corrections looked like in practice, see `docs/example-corrections.md`. It's
+illustrative only, so don't copy those entries here.
+
 ## How this is kept
 
 - **One file per pattern, not per utterance.** When it recurs, bump `times_seen` and

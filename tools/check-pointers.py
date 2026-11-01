@@ -50,7 +50,7 @@ CONFIG_DIR = Path(
 # Referenced deliberately as non-existent, with the absence as the point.
 KNOWN_ABSENT = {
     "workspace/CLAUDE.md",  # the corrected doctrine pointer; cited to explain the correction
-    "neo_sensor/fetch.py",  # the F-001 defect (docs/lessons.md#f-001), cited in neo-close as the example it is
+    "neo_sensor/fetch.py",  # the F-001 defect (docs/example-corrections.md#f-001), cited in neo-close as the example it is
     # Add more as needed. CHANGELOG.md is a HISTORICAL log, so a path in it is a statement about
     # the past, not an instruction to read. A file that deliberately does not exist (a write the
     # banned-entities hook REFUSED, a note deleted on the operator's ruling) is silenced here by

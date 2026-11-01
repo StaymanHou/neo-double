@@ -964,8 +964,8 @@ def test_a_limited_thread_read_says_it_is_a_tail(conn: sqlite3.Connection, capsy
     """`--limit` returns the newest n and used to print a result shaped like a whole one.
 
     **The failure this pins.** A session read a 320-message thread with `--limit 200`, found no
-    instance of a piece of feedback in the newest 200, and told the operator he had *never* given
-    it. He had, six times, five of them in the unread 120. `cmd_thread`'s docstring had warned
+    instance of a piece of feedback in the newest 200, and told the operator they had *never* given
+    it. They had, several times, mostly in the unread 120. `cmd_thread`'s docstring had warned
     about exactly this since it was written — documenting a trap where the reader is not looking is
     not a mitigation. The note has to arrive attached to the result.
 

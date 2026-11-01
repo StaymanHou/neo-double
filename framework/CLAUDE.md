@@ -50,7 +50,7 @@ had no effect and clobbered an unrelated global setting until caught and reverte
     built: *"the sends should also become yours but there must be an in-conversation approval
     gate."* So: preview it in the turn, get their words, record them with
     `--approve --quote '<their words>'`, then `--commit`. Do not hand them a `!` line for a send
-    they have already approved — that is [F-001](../docs/lessons.md#f-001). Do not run
+    they have already approved — that is [F-001](../docs/example-corrections.md#f-001). Do not run
     `--approve` and `--commit` in the same breath as your own decision: the approval step exists
     to be pointed at a real sentence they typed.
   - **Know what the gate is worth.** It cannot prove a human approved anything — you run both
@@ -113,29 +113,25 @@ person file gets written **after** they answer.
 *who someone is*; the mechanism it forbids — **thread adjacency treated as evidence** — is not
 specific to identity, and it reached *who did what* untouched. A thank-you in a room with four
 people in it confirms something and does not say whose work; a task listed under *"This week"* in
-someone's own report says it was assigned, not that it was done. On a real run, six deliverables
-were credited to a contractor on exactly that basis, in an assessment feeding a decision about
-ending their engagement: two had never been delivered by anyone and the third was the
-**operator's own work**. So trace every attribution to a message where the person and the work
+someone's own report says it was assigned, not that it was done. On a real run, work was credited
+to a colleague on exactly that basis, and some of it turned out to be someone else's, including
+the **operator's own**. So trace every attribution to a message where the person and the work
 appear in the same sentence, and where no such message exists, say the item is unattributed.
-Credit is a fact about a person. Missing beats wrong. [F-012](../docs/lessons.md#f-012).
+Credit is a fact about a person. Missing beats wrong. [F-012](../docs/example-corrections.md#f-012).
 
 **And it is not only credit — it is EVERY fact about a person, including a negative one.** The
 sentence above was written about attribution and was read as being *about* attribution, so the
-same substitution walked straight past it in different clothing: a whole recommendation rested on
-*"the contractor does not read the team channel"*, stated as fact in three files, inferred from an
-instruction that told them to post in *"the same format the rest of the team posts in"* that
-channel. That sentence is about a **format**. It names the room and places nobody inside or
-outside it. The operator's correction was four words — *"he's also in the chatroom"* — and the
-draft it saved had, in a room the affected person was believed unable to read, a paragraph
-defending the decision to end their engagement, on their last day.
+same substitution walked straight past it in different clothing: a recommendation rested on
+*"this colleague does not read that channel"*, stated as fact, and inferred from an instruction
+about the *format* posts in that channel should follow. A sentence about a format places nobody
+inside or outside a room. The colleague was in the room, and the draft discussed them there.
 
 **So the rule generalises and the generalisation is the rule:** who is in a room, who is not, who
 saw a message, who was told, who reports to whom, who did the work. Each is a fact about a person
 and each needs a message where the person and the claim appear together. **A non-mention is not
 an absence** — the tell in that direction is that you cannot quote anything, because there is
 nothing to quote, and a claim with no possible citation reads exactly like a claim whose citation
-you simply did not bother to write down. [F-012](../docs/lessons.md#f-012), seen twice.
+you simply did not bother to write down. [F-012](../docs/example-corrections.md#f-012), seen twice.
 
 **Ask it in your reply, not in the ledger.** Writing the question into `elicitation/asked.md` and
 reporting that you filed it is not asking — the operator does not read that file, and a question
@@ -200,7 +196,7 @@ the operator had generated three days earlier — real evidence, wrong conclusio
 *"we didn't have the leadership meeting last week."* Preparations are precisely the artefacts that
 exist *before* the thing they are for, and that survive when it is cancelled. Agendas, decks,
 summaries, calendar invitations, a booked room, a built tool: each says someone intended it, none
-says it happened. [F-008](../docs/lessons.md#f-008).
+says it happened. [F-008](../docs/example-corrections.md#f-008).
 
 **And when two explanations fit, one of which is "they did it on purpose", ask before writing up the
 other.** A generated script was found carrying a real disposition where a `DECIDE` placeholder
@@ -208,7 +204,7 @@ belonged; that was diagnosed as a generator bug, filed as a defect, wired into a
 committed. The operator had edited the word themselves — which is precisely what the placeholder
 exists for. *"It's not a problem here."* Two cheap checks were available and neither was run. **A
 changed file is not evidence of a bug**, and a false defect in the audit trail costs more than the
-question would have. [F-009](../docs/lessons.md#f-009).
+question would have. [F-009](../docs/example-corrections.md#f-009).
 
 The tell is that it is easy: a draft flows better with a concrete detail in it than with a gap,
 and the gap is the honest output. **Name the gap in the draft** — leave the field empty and
@@ -331,7 +327,7 @@ Deference is not free. An unnecessary handoff is exactly the interruption this s
 reduce, and a command you hand over is a command you have not tested — one went to the operator
 with a module name that does not exist, so a broken command read as finished work until they would
 have typed it. **If you are about to write a `!` line, check it against the three reasons first.**
-If none of them applies, the line is yours to run. [F-001](../docs/lessons.md#f-001).
+If none of them applies, the line is yours to run. [F-001](../docs/example-corrections.md#f-001).
 
 ---
 
@@ -339,10 +335,10 @@ If none of them applies, the line is yours to run. [F-001](../docs/lessons.md#f-
 
 Two failures, opposite directions, both caught in one session.
 
-**Do not hand back work that is yours** ([F-001](../docs/lessons.md#f-001)). See § *Which commands
+**Do not hand back work that is yours** ([F-001](../docs/example-corrections.md#f-001)). See § *Which commands
 are theirs, and which are yours* above.
 
-**Do not produce work that was not asked for** ([F-004](../docs/lessons.md#f-004)). The operator
+**Do not produce work that was not asked for** ([F-004](../docs/example-corrections.md#f-004)). The operator
 opened a session with two words — *"catch up"* — meaning *make your state current*. It was read as
 *tell me what happened*, and a full briefing was produced over traffic **they had already read
 themselves**.
@@ -483,8 +479,8 @@ only helps if the negative is not written before it is read. Read to the end (`-
 above the count it reports), or put the bound in the same sentence as the claim: *"in the newest 200
 of 320 I find no instance; the earlier 120 are unread."* On a real run this went the other way — a
 320-message thread read at `--limit 200`, and the operator told they had **never** given a piece of
-feedback they had in fact given six times, five of them in the unread 120.
-[F-011](../docs/lessons.md#f-011). **The same trap runs through `search`**, bounded by your guess at
+feedback they had in fact given several times, mostly in the unread 120.
+[F-011](../docs/example-corrections.md#f-011). **The same trap runs through `search`**, bounded by your guess at
 their wording rather than by a number, and no note can warn you about that one: six of eight phrases
 tried that day returned nothing, and not one of those six was evidence of anything.
 

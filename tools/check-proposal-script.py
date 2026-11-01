@@ -7,7 +7,7 @@ a comment block headed *"yours to decide"* whose four lines said there were no g
 value. That was diagnosed as a generator bug: the intended token was `DECIDE` and it had apparently
 been lost. **It had not.** He had edited the word himself — *"It's because I made the decision and
 changed DECIDE to ignore. It's not a problem here"* — which is exactly what the placeholder is for.
-No defect existed. See `docs/lessons.md#f-009`, which is the record of the misdiagnosis rather than of a
+No defect existed. See `docs/example-corrections.md#f-009`, which is the record of the misdiagnosis rather than of a
 bug.
 
 The tool survives that correction because the underlying gap is real: doctrine says *"a command you
@@ -42,7 +42,7 @@ Exit 0 clean, 1 with errors. Notes never fail the run. Use `--pre-handover` befo
 this file treated a real disposition under a *yours to decide* header as an error, on the strength
 of finding exactly that in a live script — and the actual explanation was that **he had edited the
 word himself, which is what he is supposed to do.** So a tool written to catch a fabricated defect
-would then have flagged his own ruling as one, twice over. `docs/lessons.md#f-009`.
+would then have flagged his own ruling as one, twice over. `docs/example-corrections.md#f-009`.
 """
 
 from __future__ import annotations

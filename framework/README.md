@@ -37,7 +37,7 @@ alias claude-neo='CLAUDE_CONFIG_DIR=$HOME/.config/claude-neo claude'
 cd ~/neo-workspace && claude-neo
 ```
 
-The links in these files to `docs/lessons.md` resolve inside this repo, not after install. They point
+The links in these files to `docs/example-corrections.md` resolve inside this repo, not after install. They point
 at the anonymized failure record each rule came from.
 
 ## What is here
